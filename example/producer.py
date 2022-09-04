@@ -1,16 +1,8 @@
 import uuid
-import pika
+from pika import BlockingConnection
+from utils.create_pika_conn import create_pika_conn
 
-RABBITMQ_HOST = 'localhost'
-RABBITMQ_PORT = '5672'
-RABBITMQ_USER = 'root'
-RABBITMQ_PASS = '1234'
-
-credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASS)
-parameters = pika.ConnectionParameters(host=RABBITMQ_HOST,
-                                       port=RABBITMQ_PORT,
-                                       credentials=credentials)
-connection = pika.BlockingConnection(parameters)
+connection: BlockingConnection = create_pika_conn()
 channel = connection.channel()
 
 channel.queue_declare(queue='tutorial')
