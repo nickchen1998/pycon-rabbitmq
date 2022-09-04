@@ -2,7 +2,6 @@ import time
 from pika import BlockingConnection, BasicProperties, spec
 from utils.create_pika_conn import create_pika_conn
 
-
 # ==================== produce message ====================
 # with create_pika_conn() as connection:
 #     channel = connection.channel()
@@ -72,15 +71,16 @@ from utils.create_pika_conn import create_pika_conn
 #         channel.stop_consuming()
 
 # ==================== consume message [3] ====================
+# 利用迴圈讀取資料
+with create_pika_conn() as connection:
+    channel = connection.channel()
+    channel.queue_declare(queue='hello')
 
-# channel.queue_declare(queue='hello')
+    # 透過設定 inactivity_timeout (單位: sec)，可以自動讓 consumer 於沒有收到訊息後幾秒自動關閉 for 迴圈
+    for method, properties, body in channel.consume(queue='hello', inactivity_timeout=10):
 
-# for method, properties, body in channel.consume(queue='hello', inactivity_timeout=10):
+        print(f" [x] Received {body.decode()}")
+        time.sleep(1)
 
-#     print(f" [x] Received {body.decode()}")
-#     time.sleep(1)
-
-#     if method == None and properties == None and body == None:
-#         break
-
-# connection.close()
+        if method is None and properties is None and body is None:
+            break
